@@ -3,16 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <title>ArXiv Deep Search Bot</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5; /* Light gray background for the page */
+        }
+        h1 {
+            color: #1d3557; /* Dark blue for the title */
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #query {
+            width: 400px; /* Longer search box */
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #2196f3; /* Blue border */
+            border-radius: 5px 0 0 5px; /* Rounded corners on the left */
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #query:focus {
+            border-color: #1d3557; /* Darker blue on focus */
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #2196f3; /* Blue button */
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0; /* Rounded corners on the right */
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1d3557; /* Darker blue on hover */
+        }
+        .description-box {
+            background-color: #f0f9ff; /* Light blue background */
+            border-left: 5px solid #2196f3; /* Blue border on the left */
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+            max-width: 600px; /* Match the width of the search box for alignment */
+        }
+        .description-box a {
+            color: #2196f3;
+            text-decoration: none;
+        }
+        .description-box a:hover {
+            text-decoration: underline;
+        }
+        #output {
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 1em;
+            max-width: 600px; /* Align with the description box */
+        }
+    </style>
 </head>
-<body style="font-family: sans-serif;">
+<body>
     <h1>ArXiv Deep Search Bot</h1>
-    <input type="text" id="query" placeholder="Enter your query">
-    <button onclick="startSearch()">Search</button>
-    <p style="font-size: 14px; color: #555; margin-top: 10px;">
-        A tool to explore arXiv papers using a tech stack of Spark, BERT embeddings, inverted indexing, a custom crawler, and an LLM summarizer. It builds a Retrieval-Augmented Generation (RAG) system as context to interact with Grok for insightful answers.
-        <a href="https://github.com/neilmaw/DeepSearch-arXiv" target="_blank">View on GitHub</a>
-    </p>
-    <div id="output" style="font-family: monospace; white-space: pre-wrap; margin-top: 1em;"></div>
+    <div class="search-container">
+        <input type="text" id="query" placeholder="Enter your query">
+        <button onclick="startSearch()">Search</button>
+    </div>
+
+    <div class="description-box">
+        <p>A tool to explore arXiv papers using a tech stack of Spark, BERT embeddings, inverted indexing, a custom crawler, and an LLM summarizer.</p>
+        <p>It builds a Retrieval-Augmented Generation (RAG) system as context to interact with Grok for insightful answers. <a href="https://github.com/neilmaw/DeepSearch-arXiv" target="_blank">View on GitHub</a></p>
+    </div>
+
+    <div id="output"></div>
 
     <script>
         const output = document.getElementById("output");
@@ -21,7 +98,7 @@
             const query = document.getElementById("query").value;
             output.textContent = "Connecting...\n";
             const ws = new WebSocket("ws://deepsearch-arxiv.com:8000/ws/search");
-	    ws.onopen = function () {
+            ws.onopen = function () {
                 output.textContent += "Connected!\n";
                 ws.send(JSON.stringify({ query: query }));
             };
