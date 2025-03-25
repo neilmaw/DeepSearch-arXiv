@@ -1,0 +1,10 @@
+venv/
+bert_embeddings.parquet
+data/
+spark-3.5.3-bin-hadoop3/
+*.parquet
+*.pkl
+*.log
+__pycache__/
+spark-3.5.5-bin-hadoop3/
+test.py

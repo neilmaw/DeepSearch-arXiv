@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ArXiv Deep Search Bot</title>
+</head>
+<body style="font-family: sans-serif;">
+    <h1>ArXiv Deep Search Bot</h1>
+    <input type="text" id="query" placeholder="Enter your query">
+    <button onclick="startSearch()">Search</button>
+
+    <div id="output" style="font-family: monospace; white-space: pre-wrap; margin-top: 1em;"></div>
+
+    <script>
+        const output = document.getElementById("output");
+
+        function startSearch() {
+            const query = document.getElementById("query").value;
+            output.textContent = "Connecting...\n";
+            const ws = new WebSocket("ws://deepsearch-arxiv.com:8000/ws/search");
+	    ws.onopen = function () {
+                output.textContent += "Connected!\n";
+                ws.send(JSON.stringify({ query: query }));
+            };
+
+            ws.onmessage = function (event) {
+                console.log("RAW MESSAGE:", event.data);
+                const data = JSON.parse(event.data);
+
+                if (data.error) {
+                    output.innerHTML += `<div style="color: red;">❌ Error: ${data.error}</div>`;
+                } else if (data.step) {
+                    output.innerHTML += `<div style="color: #007acc;">🔹 ${data.step}</div>`;
+                } else if (data.result) {
+                    const resultBlock = document.createElement("div");
+                    resultBlock.style.marginTop = "1em";
+                    resultBlock.style.padding = "12px";
+                    resultBlock.style.backgroundColor = "#f0f9ff";
+                    resultBlock.style.color = "#003049";
+                    resultBlock.style.borderLeft = "5px solid #2196f3";
+                    resultBlock.style.borderRadius = "6px";
+                    resultBlock.style.fontFamily = "monospace";
+                    resultBlock.style.whiteSpace = "pre-wrap";
+
+                    resultBlock.innerHTML = `
+                        <div style="color: #1d3557; font-weight: bold; margin-bottom: 0.5em;">Final Result:</div>
+                        <div>${data.result.replace(/\n/g, '<br>')}</div>
+                    `;
+                    output.appendChild(resultBlock);
+                } else if (data.final) {
+                    output.innerHTML += `<div style="color: green;">✅ Process completed!</div>`;
+                }
+            };
+
+            ws.onclose = function () {
+                output.innerHTML += `<div style="color: gray;">🔌 Connection closed.</div>`;
+            };
+
+            ws.onerror = function (error) {
+                output.innerHTML += `<div style="color: red;">⚠️ Error occurred: ${error}</div>`;
+            };
+        }
+    </script>
+</body>
+</html>
