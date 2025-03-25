@@ -3,7 +3,7 @@ from openai import OpenAI
 class GrokClient:
     def __init__(self, q):
         self.client = OpenAI(
-            api_key="xai-r9fWsSSsbRMo3tv7ZHZmF2BRLhdAoiNWHGmm5dTmwL1oUBJp0v719wkSyiJnieiBAXycUOSEt6buUSgd",
+            api_key="[YOUR_API_KEY]",
             base_url="https://api.x.ai/v1",
         )
         self.q = q
